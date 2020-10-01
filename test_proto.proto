@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package test;
+
+option cc_generic_services = true;
+
+message EchoRequest {
+    bytes msg = 1;
+}
+ 
+message EchoResponse {
+    bytes msg = 1;
+}
+ 
+service EchoService {
+    rpc Echo(EchoRequest) returns (EchoResponse);
+}
