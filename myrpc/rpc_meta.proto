@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package myrpc;
+
+option cc_generic_services = true;
+
+message RpcMeta {
+    bytes service_name = 1;
+    bytes method_name = 2;
+    uint64 data_size = 3;
+}
