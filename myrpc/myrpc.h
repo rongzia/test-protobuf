@@ -8,6 +8,19 @@
 #include "boost/make_shared.hpp"
 
 namespace myrpc {
+
+    class DonePara{
+    public:
+        DonePara(
+                ::google::protobuf::Message *recv_msg,
+                ::google::protobuf::Message *resp_msg,
+                const boost::shared_ptr<boost::asio::ip::tcp::socket> sock)
+                : resp_msg_(resp_msg), recv_msg_(recv_msg), sock_(sock){}
+        ::google::protobuf::Message *recv_msg_;
+        ::google::protobuf::Message *resp_msg_;
+        const boost::shared_ptr<boost::asio::ip::tcp::socket> sock_;
+    };
+
     class Controller : public ::google::protobuf::RpcController {
     public:
         virtual void Reset() {};
@@ -92,8 +105,6 @@ namespace myrpc {
                 const std::string &serialzied_data,
                 const boost::shared_ptr<boost::asio::ip::tcp::socket> &sock);
 
-        struct DonePara;
-
         void on_resp_msg_filled(DonePara para);
 
         void pack_message(
@@ -159,16 +170,7 @@ namespace myrpc {
         }
     }
 
-    struct DonePara{
-        DonePara(
-                ::google::protobuf::Message *recv_msg,
-                ::google::protobuf::Message *resp_msg,
-                const boost::shared_ptr<boost::asio::ip::tcp::socket> sock)
-                : resp_msg_(resp_msg), recv_msg_(recv_msg), sock_(sock){}
-        ::google::protobuf::Message *recv_msg_;
-        ::google::protobuf::Message *resp_msg_;
-        const boost::shared_ptr<boost::asio::ip::tcp::socket> sock_;
-    };
+
     void Server::dispatch_msg(
             const std::string &service_name,
             const std::string &method_name,
@@ -187,11 +189,11 @@ namespace myrpc {
         auto resp_msg = service->GetResponsePrototype(md).New();
 
         Controller controller;
-        DonePara para(recv_msg, resp_msg, sock);
+        DonePara * para = new DonePara(recv_msg, resp_msg, sock);
         auto done = ::google::protobuf::NewCallback(
                 this,
                 &Server::on_resp_msg_filled,
-                para);
+                *para);
         service->CallMethod(md, &controller, recv_msg, resp_msg, done);
     }
 
