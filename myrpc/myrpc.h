@@ -60,6 +60,9 @@ namespace myrpc {
             rpc_meta.set_method_name(method->name());
             rpc_meta.set_data_size(serialzied_data.size());
 
+            std::cout << "CallMethod, service_name:" << method->service()->name() << std::endl;
+            std::cout << "CallMethod,  method_name:" << method->name() << std::endl;
+
             std::string serialzied_str = rpc_meta.SerializeAsString();
 
             size_t serialzied_size = serialzied_str.size();
@@ -71,7 +74,7 @@ namespace myrpc {
             char resp_data_size[sizeof(size_t)];
             _sock->receive(boost::asio::buffer(resp_data_size));
 
-            int resp_data_len = *(size_t *) resp_data_size;
+            size_t resp_data_len = *(size_t *) resp_data_size;
             std::vector<char> resp_data(resp_data_len, 0);
             _sock->receive(boost::asio::buffer(resp_data));
 
@@ -145,10 +148,10 @@ namespace myrpc {
                       << std::endl;
 
             //接收meta长度
-            char meta_size[sizeof(int)];
+            char meta_size[sizeof(size_t)];
             sock->receive(boost::asio::buffer(meta_size));
 
-            int meta_len = *(int *) (meta_size);
+            size_t meta_len = *(size_t *) (meta_size);
 
             //接收meta数据
             std::vector<char> meta_data(meta_len, 0);
