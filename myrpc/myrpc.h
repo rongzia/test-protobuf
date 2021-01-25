@@ -22,6 +22,7 @@ namespace myrpc {
     };
 
     class Controller : public ::google::protobuf::RpcController {
+
     public:
         virtual void Reset() {};
 
